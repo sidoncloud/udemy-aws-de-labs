@@ -1,0 +1,85 @@
+{
+  "Comment": "A Step Function to process ECS tasks and handle output conditions",
+  "StartAt": "DataValidation",
+  "States": {
+    "DataValidation": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::ecs:runTask.sync",
+      "Parameters": {
+        "Cluster": "ecommerce-data-ingestion-cluster",
+        "TaskDefinition": "arn:aws:ecs:us-east-1:127489365181:task-definition/task-data-validation:3",
+        "LaunchType": "FARGATE",
+        "Overrides": {
+          "ContainerOverrides": [
+            {
+              "Name": "container-data-validation",
+              "Environment": [
+                {
+                  "Name": "TASK_TOKEN",
+                  "Value.$": "$$.Task.Token"
+                }
+              ]
+            }
+          ]
+        },
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "Subnets": [
+              "subnet-09acbb015269e26a4",
+              "subnet-01eb739e9929b69fb"
+            ],
+            "AssignPublicIp": "ENABLED"
+          }
+        }
+      },
+      "Next": "CheckCondition",
+      "ResultPath": "$.taskOutput"
+    },
+    "CheckCondition": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "And": [
+            {
+              "Variable": "$.taskOutput.orders",
+              "NumericEquals": 1
+            },
+            {
+              "Variable": "$.taskOutput.order_items",
+              "NumericEquals": 1
+            },
+            {
+              "Variable": "$.taskOutput.products",
+              "NumericEquals": 1
+            }
+          ],
+          "Next": "InvokeSecondTask"
+        }
+      ],
+      "Default": "EndState"
+    },
+    "InvokeSecondTask": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::ecs:runTask.sync",
+      "Parameters": {
+        "Cluster": "ecommerce-data-ingestion-cluster",
+        "TaskDefinition": "arn:aws:ecs:us-east-1:127489365181:task-definition/task-etl-calculations:1",
+        "LaunchType": "FARGATE",
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "Subnets": [
+              "subnet-09acbb015269e26a4",
+              "subnet-01eb739e9929b69fb"
+            ],
+            "AssignPublicIp": "ENABLED"
+          }
+        }
+      },
+      "End": true
+    },
+    "EndState": {
+      "Type": "Pass",
+      "End": true
+    }
+  }
+}

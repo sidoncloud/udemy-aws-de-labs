@@ -1,0 +1,108 @@
+{
+  "Comment": "Create an EMR Cluster, run Spark jobs, and terminate the cluster regardless of job success",
+  "StartAt": "CreateEMRCluster",
+  "States": {
+    "CreateEMRCluster": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::elasticmapreduce:createCluster.sync",
+      "Parameters": {
+        "Name": "EMR Cluster with Specific Applications",
+        "ReleaseLabel": "emr-7.1.0",
+        "Applications": [
+          {
+            "Name": "Spark"
+          }
+        ],
+        "Instances": {
+          "InstanceGroups": [
+            {
+              "Name": "Master nodes",
+              "InstanceRole": "MASTER",
+              "InstanceType": "m5.xlarge",
+              "InstanceCount": 1,
+              "Market": "ON_DEMAND"
+            },
+            {
+              "Name": "Core nodes",
+              "InstanceRole": "CORE",
+              "InstanceType": "m5.xlarge",
+              "InstanceCount": 2,
+              "Market": "ON_DEMAND"
+            }
+          ],
+          "KeepJobFlowAliveWhenNoSteps": true,
+          "TerminationProtected": false
+        },
+        "JobFlowRole": "emr-ec2-custom-role",
+        "ServiceRole": "emr-custom-service-role",
+        "VisibleToAllUsers": true
+      },
+      "ResultPath": "$.EMRClusterOutput",
+      "Next": "AddSparkJob1"
+    },
+    "AddSparkJob1": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::elasticmapreduce:addStep.sync",
+      "Parameters": {
+        "ClusterId.$": "$.EMRClusterOutput.ClusterId",
+        "Step": {
+          "Name": "Spark Job 1",
+          "ActionOnFailure": "CONTINUE",
+          "HadoopJarStep": {
+            "Jar": "command-runner.jar",
+            "Args": [
+              "spark-submit",
+              "--deploy-mode",
+              "cluster",
+              "s3://nl-aws-de-labs/spark-scripts/spark-agg1.py"
+            ]
+          }
+        }
+      },
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "TerminateCluster"
+        }
+      ],
+      "ResultPath": null,
+      "Next": "AddSparkJob2"
+    },
+    "AddSparkJob2": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::elasticmapreduce:addStep.sync",
+      "Parameters": {
+        "ClusterId.$": "$.EMRClusterOutput.ClusterId",
+        "Step": {
+          "Name": "Spark Job 2",
+          "ActionOnFailure": "CONTINUE",
+          "HadoopJarStep": {
+            "Jar": "command-runner.jar",
+            "Args": [
+              "spark-submit",
+              "--deploy-mode",
+              "cluster",
+              "s3://nl-aws-de-labs/spark-scripts/spark-agg2.py"
+            ]
+          }
+        }
+      },
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "TerminateCluster"
+        }
+      ],
+      "ResultPath": null,
+      "Next": "TerminateCluster"
+    },
+    "TerminateCluster": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::elasticmapreduce:terminateCluster.sync",
+      "Parameters": {
+        "ClusterId.$": "$.EMRClusterOutput.ClusterId"
+      },
+      "End": true
+    }
+  }
+}

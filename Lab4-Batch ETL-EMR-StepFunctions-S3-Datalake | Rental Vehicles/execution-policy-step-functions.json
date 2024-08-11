@@ -1,0 +1,35 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "iam:PassRole",
+            "Resource": [
+                "arn:aws:iam::127489365181:role/emr-custom-service-role",
+                "arn:aws:iam::127489365181:role/emr-ec2-custom-role"
+            ],
+            "Condition": {
+                "StringEquals": {
+                    "iam:PassedToService": [
+                        "elasticmapreduce.amazonaws.com",
+                        "ec2.amazonaws.com"
+                    ]
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "elasticmapreduce:RunJobFlow",
+                "elasticmapreduce:DescribeStep",
+                "elasticmapreduce:ListClusters",
+                "elasticmapreduce:DescribeCluster",
+                "elasticmapreduce:TerminateJobFlows",
+                "elasticmapreduce:AddJobFlowSteps",
+                "elasticmapreduce:ModifyCluster",
+                "elasticmapreduce:ListSteps"
+            ],
+            "Resource": "*"
+        }
+    ]
+}

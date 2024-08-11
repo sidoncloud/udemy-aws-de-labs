@@ -1,0 +1,14 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+      {
+          "Effect": "Allow",
+          "Action": [
+              "states:SendTaskSuccess",
+              "states:SendTaskFailure",
+              "states:SendTaskHeartbeat"
+          ],
+          "Resource": "arn:aws:states:us-east-1:{aws-account-number}:stateMachine:*"
+      }
+  ]
+}

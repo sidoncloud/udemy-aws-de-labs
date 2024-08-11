@@ -1,0 +1,14 @@
+{
+  "source": ["aws.s3"],
+  "detail-type": ["Object Created"],
+  "detail": {
+    "bucket": {
+      "name": ["nl-aws-de-labs"]
+    },
+    "object": {
+      "key": [{
+        "prefix": "ecommerce-data/new/order_items"
+      }]
+    }
+  }
+}

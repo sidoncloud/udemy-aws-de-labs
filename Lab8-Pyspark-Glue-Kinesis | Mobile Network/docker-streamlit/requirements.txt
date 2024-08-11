@@ -1,0 +1,4 @@
+Flask==2.2.1
+boto3==1.17.44
+Werkzeug==2.2.2
+streamlit==1.32.0
