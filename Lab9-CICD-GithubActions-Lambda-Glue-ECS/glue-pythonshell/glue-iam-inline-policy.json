@@ -1,0 +1,15 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Action": "iam:PassRole",
+			"Resource": "arn:aws:iam::{aws-account-number}:role/github-actions-glue-role",
+			"Condition": {
+				"StringEquals": {
+					"iam:PassedToService": "glue.amazonaws.com"
+				}
+			}
+		}
+	]
+}

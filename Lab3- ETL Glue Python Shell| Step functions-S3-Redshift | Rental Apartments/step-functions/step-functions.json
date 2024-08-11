@@ -1,0 +1,83 @@
+{
+  "Comment": "A workflow to trigger Glue jobs for database operations",
+  "StartAt": "MysqlExtractionJobApartments",
+  "States": {
+    "MysqlExtractionJobApartments": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::glue:startJobRun.sync",
+      "Parameters": {
+        "JobName": "mysql-extraction-job",
+        "Arguments": {
+          "--table_name": "apartments",
+          "--load_type": "incremental"
+        }
+      },
+      "Next": "RedshiftRawIngestionApartments"
+    },
+    "RedshiftRawIngestionApartments": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::glue:startJobRun.sync",
+      "Parameters": {
+        "JobName": "redshift-raw-ingestion",
+        "Arguments": {
+          "--table_name": "apartments"
+        }
+      },
+      "Next": "MysqlExtractionJobApartmentViewings"
+    },
+    "MysqlExtractionJobApartmentViewings": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::glue:startJobRun.sync",
+      "Parameters": {
+        "JobName": "mysql-extraction-job",
+        "Arguments": {
+          "--table_name": "apartment_viewings",
+          "--load_type": "incremental"
+        }
+      },
+      "Next": "RedshiftRawIngestionApartmentViewings"
+    },
+    "RedshiftRawIngestionApartmentViewings": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::glue:startJobRun.sync",
+      "Parameters": {
+        "JobName": "redshift-raw-ingestion",
+        "Arguments": {
+          "--table_name": "apartment_viewings"
+        }
+      },
+      "Next": "MysqlExtractionJobApartmentAttributes"
+    },
+    "MysqlExtractionJobApartmentAttributes": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::glue:startJobRun.sync",
+      "Parameters": {
+        "JobName": "mysql-extraction-job",
+        "Arguments": {
+          "--table_name": "apartment_attributes",
+          "--load_type": "full_load"
+        }
+      },
+      "Next": "RedshiftRawIngestionApartmentAttributes"
+    },
+    "RedshiftRawIngestionApartmentAttributes": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::glue:startJobRun.sync",
+      "Parameters": {
+        "JobName": "redshift-raw-ingestion",
+        "Arguments": {
+          "--table_name": "apartment_attributes"
+        }
+      },
+      "Next": "RedshiftProcessedLayerIngestion"
+    },
+    "RedshiftProcessedLayerIngestion": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::glue:startJobRun.sync",
+      "Parameters": {
+        "JobName": "redshift-processed-layer-ingestion"
+      },
+      "End": true
+    }
+  }
+}

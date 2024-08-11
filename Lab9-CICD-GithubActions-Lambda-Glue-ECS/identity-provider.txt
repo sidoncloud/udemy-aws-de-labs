@@ -1,0 +1,2 @@
+Provider URL = token.actions.githubusercontent.com
+Audience = sts.amazonaws.com

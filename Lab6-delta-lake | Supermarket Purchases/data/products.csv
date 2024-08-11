@@ -1,0 +1,135 @@
+product_id,department_id,department,product_name
+4,83,4,produce,fresh vegetables
+6,120,16,dairy eggs,yogurt
+17,21,16,dairy eggs,packaged cheese
+32,24,4,produce,fresh fruits
+41,43,3,bakery,buns rolls
+49,86,16,dairy eggs,eggs
+54,17,13,pantry,baking ingredients
+56,110,13,pantry,pickled goods olives
+65,91,16,dairy eggs,soy lactosefree
+70,30,6,international,latino foods
+88,106,12,meat seafood,hot dogs bacon sausage
+93,123,4,produce,packaged vegetables fruits
+102,84,16,dairy eggs,milk
+114,107,19,snacks,chips pretzels
+118,51,13,pantry,preserved dips spreads
+119,54,17,household,paper goods
+126,9,9,dry goods pasta,pasta sauce
+135,129,1,frozen,frozen appetizers sides
+136,69,15,canned goods,soup broth bouillon
+145,112,3,bakery,bread
+158,59,15,canned goods,canned meals beans
+171,81,15,canned goods,canned jarred vegetables
+176,98,7,beverages,juice nectars
+177,100,21,missing,missing
+178,53,16,dairy eggs,cream
+184,77,7,beverages,soft drinks
+208,64,7,beverages,energy sports drinks
+212,23,19,snacks,popcorn jerky
+236,78,19,snacks,crackers
+242,45,19,snacks,candy chocolate
+244,130,14,breakfast,hot cereal pancake mixes
+247,67,20,deli,fresh dips tapenades
+249,50,19,snacks,fruit vegetable snacks
+285,128,3,bakery,tortillas flat bread
+286,14,20,deli,tofu meat alternatives
+290,115,7,beverages,water seltzer sparkling water
+294,25,11,personal care,soap
+299,58,1,frozen,frozen breads doughs
+311,37,1,frozen,ice cream ice
+352,46,19,snacks,mint gum
+388,3,19,snacks,energy granola bars
+417,32,4,produce,packaged produce
+427,26,7,beverages,coffee
+430,96,20,deli,lunch meat
+458,36,16,dairy eggs,butter
+483,101,17,household,air fresheners candles
+508,72,13,pantry,condiments
+513,48,14,breakfast,breakfast bars pastries
+542,31,7,beverages,refrigerated
+567,133,11,personal care,muscles joints pain relief
+573,92,18,babies,baby food formula
+634,104,13,pantry,spices seasonings
+652,38,1,frozen,frozen meals
+664,93,3,bakery,breakfast bakery
+707,117,19,snacks,nuts seeds dried fruit
+762,61,19,snacks,cookies cakes
+768,108,16,dairy eggs,other creams cheeses
+898,34,1,frozen,frozen meat seafood
+924,12,9,dry goods pasta,fresh pasta
+952,94,7,beverages,tea
+959,52,1,frozen,frozen breakfast
+992,114,17,household,cleaning products
+1004,4,9,dry goods pasta,instant foods
+1036,131,9,dry goods pasta,dry pasta
+1054,42,1,frozen,frozen vegan vegetarian
+1128,70,11,personal care,digestion
+1163,13,20,deli,prepared meals
+1188,121,14,breakfast,cereal
+1234,116,1,frozen,frozen produce
+1242,111,17,household,plates bowls cups flatware
+1317,79,1,frozen,frozen pizza
+1342,124,5,alcohol,spirits
+1343,27,5,alcohol,beers coolers
+1352,99,15,canned goods,canned fruit applesauce
+1358,75,17,household,laundry
+1381,5,13,pantry,marinades meat preparation
+1412,57,14,breakfast,granola
+1418,125,19,snacks,trail mix snack mix
+1457,16,4,produce,fresh herbs
+1492,66,6,international,asian foods
+1503,22,11,personal care,hair care
+1574,126,11,personal care,feminine care
+1593,19,13,pantry,oils vinegars
+1682,95,15,canned goods,canned meat seafood
+1781,2,16,dairy eggs,specialty cheeses
+1897,35,12,meat seafood,poultry counter
+1916,49,12,meat seafood,packaged poultry
+2058,1,20,deli,prepared soups salads
+2107,74,17,household,dish detergents
+2164,47,11,personal care,vitamins supplements
+2215,119,1,frozen,frozen dessert
+2375,80,11,personal care,deodorants
+2406,97,13,pantry,baking supplies decor
+2474,7,12,meat seafood,packaged meat
+2531,8,3,bakery,bakery desserts
+2787,88,13,pantry,spreads
+2790,105,13,pantry,doughs gelatins bake mixes
+2855,65,11,personal care,protein meal replacements
+2955,127,11,personal care,body lotions soap
+3174,63,9,dry goods pasta,grains rice dried goods
+3320,60,17,household,trash bags liners
+3323,41,8,pets,cat food care
+4073,29,13,pantry,honeys syrups nectars
+4395,40,8,pets,dog food care
+4403,89,13,pantry,salad dressing toppings
+4424,87,17,household,more household
+4514,62,5,alcohol,white wines
+4557,85,17,household,food storage
+4855,11,11,personal care,cold flu allergy
+5095,56,18,babies,diapers wipes
+5153,20,11,personal care,oral hygiene
+5223,103,19,snacks,ice cream toppings
+5272,15,12,meat seafood,packaged seafood
+5408,28,5,alcohol,red wines
+5410,134,5,alcohol,specialty wines champagnes
+5492,122,12,meat seafood,meat counter
+8556,6,2,other,other
+8843,132,11,personal care,beauty
+9325,118,11,personal care,first aid
+10769,68,10,bulk,bulk grains rice dried goods
+10796,82,18,babies,baby accessories
+11638,76,6,international,indian foods
+11876,90,7,beverages,cocoa drink mixes
+12798,10,17,household,kitchen supplies
+12951,73,11,personal care,facial care
+13215,71,16,dairy eggs,refrigerated pudding desserts
+17146,39,12,meat seafood,seafood counter
+20239,113,1,frozen,frozen juice
+24387,33,6,international,kosher foods
+26925,18,10,bulk,bulk dried fruits vegetables
+28180,44,11,personal care,eye ear care
+30257,55,11,personal care,shave needs
+32130,109,11,personal care,skin care
+37777,102,18,babies,baby bath body care

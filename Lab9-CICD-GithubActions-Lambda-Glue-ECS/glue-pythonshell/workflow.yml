@@ -1,0 +1,55 @@
+name: Deploy AWS Glue Job
+on:
+  push:
+    branches:
+      - main
+env:
+  AWS_REGION: us-east-1
+  GLUE_JOB_NAME: mysql-extraction-job
+  GLUE_SCRIPT_PATH: s3://nl-aws-de-labs/glue-scripts/mysql_extraction.py
+  GITHUB_ACTIONS_ROLE: arn:aws:iam::127489365181:role/github-actions-glue-role
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  deploy:
+    name: Deploy Glue Job
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
+      - name: Install dependencies
+        run: |
+          pip install awscli boto3 pymysql
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ env.GITHUB_ACTIONS_ROLE }}
+
+      - name: Upload script to S3
+        run: |
+          aws s3 cp ./mysql_extraction.py s3://nl-aws-de-labs/glue-scripts/
+
+      - name: Run unit tests
+        run: |
+          python -m unittest discover -s . -p 'test_*.py'
+
+      - name: Create or Update Glue Job
+        run: |
+          if aws glue get-job --job-name ${{ env.GLUE_JOB_NAME }}; then
+            echo "Updating Glue job..."
+            aws glue update-job --job-name ${{ env.GLUE_JOB_NAME }} --job-update '{"Role":"${{ env.GITHUB_ACTIONS_ROLE }}", "Command":{"Name":"glue-etl", "ScriptLocation":"${{ env.GLUE_SCRIPT_PATH }}", "PythonVersion":"3"}}'
+          else
+            echo "Creating Glue job..."
+            aws glue create-job --name ${{ env.GLUE_JOB_NAME }} --role ${{ env.GITHUB_ACTIONS_ROLE }} --command '{"Name":"glue-etl", "ScriptLocation":"${{ env.GLUE_SCRIPT_PATH }}", "PythonVersion":"3"}' --glue-version "4.0" --max-capacity 1
+          fi
