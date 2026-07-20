@@ -28,7 +28,7 @@ def get_rds_credentials(secret_name, region_name):
     credentials = json.loads(secret)
     return credentials
 
-credentials = get_rds_credentials("rental_db", "us-east-1")
+credentials = get_rds_credentials("rental_db", "eu-west-1")
 
 # DB Credentials
 user_name = credentials['username']
@@ -37,7 +37,7 @@ password = credentials['password']
 db_name = "rental_apartments"
 
 # S3 bucket Path
-s3_bucket = "nl-aws-de-labs"
+s3_bucket = "udemy-aws-dataeng-labs"
 s3_key = f'raw_landing_zone/apartment_db/{table_name}/data.csv'
 
 dynamodb = boto3.resource('dynamodb')

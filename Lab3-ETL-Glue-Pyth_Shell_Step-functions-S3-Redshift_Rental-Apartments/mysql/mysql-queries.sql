@@ -1,4 +1,4 @@
-mysql --local-infile=1 -h {mysql-endpoint} -P 3306 -u admin -p
+mysql --local-infile=1 -h rental-apartments-db.cluster-cnem8eeqw8t5.eu-west-1.rds.amazonaws.com -P 3306 -u admin -p
 
 create database rental_apartments;
 

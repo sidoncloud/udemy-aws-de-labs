@@ -15,10 +15,10 @@ args = getResolvedOptions(sys.argv, ["table_name"])
 table_name = args["table_name"]
 
 # Define constants
-bucket_name = "s3://nl-aws-de-labs"
-redshift_iam_arn = "arn:aws:iam::127489365181:role/service-role/AmazonRedshift-CommandsAccessRole-20240716T164456"
+bucket_name = "s3://udemy-aws-dataeng-labs"
+redshift_iam_arn = "arn:aws:iam::135053816219:role/service-role/AmazonRedshift-CommandsAccessRole-20260319T160711"
 secret_name = "dwh-credentials"
-region_name = "us-east-1"
+region_name = "eu-west-1"
 
 def get_redshift_credentials(secret_name, region_name):
     session = boto3.session.Session()
