@@ -1,9 +1,8 @@
 from datetime import datetime, timedelta
 from airflow import DAG
-from airflow.operators.python import PythonOperator, BranchPythonOperator
-from airflow.utils.dates import days_ago
-from airflow.operators.dummy import DummyOperator
-from airflow.hooks.postgres_hook import PostgresHook
+from airflow.providers.standard.operators.python import PythonOperator, BranchPythonOperator
+from airflow.providers.standard.operators.empty import EmptyOperator
+from airflow.providers.amazon.aws.hooks.redshift_sql import RedshiftSQLHook
 import pandas as pd
 import boto3
 import logging
@@ -11,7 +10,7 @@ import logging
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'start_date': days_ago(1),
+    'start_date': datetime(2026, 10, 12),
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 1,
@@ -112,20 +111,21 @@ def validate_datasets():
 
 def branch_task(ti):
     validation_results = ti.xcom_pull(task_ids='validate_datasets')
-    
+
     if all(validation_results.values()):
         return 'calculate_genre_level_kpis'
     else:
         return 'end_dag'
 
 def upsert_to_redshift(df, table_name, id_columns):
-    redshift_hook = PostgresHook(postgres_conn_id="redshift_default")
+    redshift_hook = RedshiftSQLHook(redshift_conn_id="redshift_default")
     conn = redshift_hook.get_conn()
     cursor = conn.cursor()
 
     try:
-        # Convert DataFrame to list of tuples
-        data_tuples = [tuple(x) for x in df.to_numpy()]
+        # Convert DataFrame to list of tuples of plain Python values
+        # (astype(object) turns numpy int64/float64 into Python int/float)
+        data_tuples = list(df.astype(object).itertuples(index=False, name=None))
 
         # Create insert query for the temporary table
         cols = ', '.join(list(df.columns))
@@ -134,22 +134,24 @@ def upsert_to_redshift(df, table_name, id_columns):
 
         cursor.executemany(tmp_table_query, data_tuples)
 
-        # Create the merge (upsert) query
+        # Merge (upsert): one statement per execute call, committed together below
         delete_condition = ' AND '.join([f'tmp_{table_name}.{col} = {table_name}.{col}' for col in id_columns])
-        merge_query = f"""
-        BEGIN;
-        DELETE FROM reporting_schema.{table_name}
-        USING reporting_schema.tmp_{table_name}
-        WHERE {delete_condition};
 
-        INSERT INTO reporting_schema.{table_name}
-        SELECT * FROM reporting_schema.tmp_{table_name};
+        cursor.execute(f"""
+            DELETE FROM reporting_schema.{table_name}
+            USING reporting_schema.tmp_{table_name}
+            WHERE {delete_condition}
+        """)
 
-        TRUNCATE TABLE reporting_schema.tmp_{table_name};
-        COMMIT;
-        """
+        cursor.execute(f"""
+            INSERT INTO reporting_schema.{table_name}
+            SELECT * FROM reporting_schema.tmp_{table_name}
+        """)
 
-        cursor.execute(merge_query)
+        # DELETE instead of TRUNCATE: in Redshift, TRUNCATE commits immediately
+        # and would break the single-transaction upsert
+        cursor.execute(f"DELETE FROM reporting_schema.tmp_{table_name}")
+
         conn.commit()
         logging.info(f"Data ingested and merged successfully into {table_name}")
     except Exception as e:
@@ -253,7 +255,12 @@ def move_processed_files():
         logging.error(f"Failed to move files from {STREAMS_PREFIX} to {ARCHIVE_PREFIX}: {str(e)}")
         raise
 
-with DAG('data_validation_and_kpi_computation', default_args=default_args, schedule_interval='@daily') as dag:
+with DAG(
+    'data_validation_and_kpi_computation',
+    default_args=default_args,
+    schedule='@daily',
+    catchup=False,
+) as dag:
     validate_datasets = PythonOperator(
         task_id='validate_datasets',
         python_callable=validate_datasets
@@ -261,8 +268,7 @@ with DAG('data_validation_and_kpi_computation', default_args=default_args, sched
 
     check_validation = BranchPythonOperator(
         task_id='check_validation',
-        python_callable=branch_task,
-        provide_context=True
+        python_callable=branch_task
     )
 
     calculate_genre_level_kpis = PythonOperator(
@@ -280,9 +286,9 @@ with DAG('data_validation_and_kpi_computation', default_args=default_args, sched
         python_callable=move_processed_files
     )
 
-    end_dag = DummyOperator(
+    end_dag = EmptyOperator(
         task_id='end_dag'
     )
 
-    validate_datasets >> check_validation >> [calculate_genre_level_kpis,end_dag]
-    calculate_genre_level_kpis >> calculate_hourly_kpis>>move_files
+    validate_datasets >> check_validation >> [calculate_genre_level_kpis, end_dag]
+    calculate_genre_level_kpis >> calculate_hourly_kpis >> move_files
